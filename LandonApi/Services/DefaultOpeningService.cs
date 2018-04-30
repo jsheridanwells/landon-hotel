@@ -20,7 +20,9 @@ namespace LandonApi.Services
             _dateLogicService = dateLogicService;
         }
 
-        public async Task<PagedResults<Opening>> GetOpeningsAsync(PagingOptions pagingOptions, CancellationToken ct)
+        public async Task<PagedResults<Opening>> GetOpeningsAsync(
+            PagingOptions pagingOptions,
+            CancellationToken ct)
         {
             var rooms = await _context.Rooms.ToArrayAsync();
 

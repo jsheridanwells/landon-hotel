@@ -32,7 +32,7 @@ namespace LandonApi.Infrastructure
                 .ForMember(dest => dest.Room, opt => opt.MapFrom(src =>
                     Link.To(
                         nameof(Controllers.RoomsController.GetRoomByIdAsync),
-                        new { roomId = src.Room.Id })));
+                        new { roomId = src.Id })));
         }
     }
 }

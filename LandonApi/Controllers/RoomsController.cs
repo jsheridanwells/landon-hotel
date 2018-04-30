@@ -28,36 +28,45 @@ namespace LandonApi.Controllers
         }
 
         [HttpGet(Name = nameof(GetRoomsAsync))]
-        public async Task<IActionResult> GetRoomsAsync(CancellationToken ct)
-        {
-            var rooms = await _roomService.GetRoomsAsync(ct);
-
-            var collection = new Collection<Room>
-            {
-                Self = Link.ToCollection(nameof(GetRoomsAsync)),
-                Value = rooms.ToArray()
-            };
-
-            return Ok(collection);
-        }
-
-        // GET /rooms/openings
-        [HttpGet("openings", Name = nameof(GetAllRoomOpeningsAsync))]
-        public async Task<IActionResult> GetAllRoomOpeningsAsync([FromQuery] PagingOptions pagingOptions, CancellationToken ct)
+        public async Task<IActionResult> GetRoomsAsync(
+            [FromQuery] PagingOptions pagingOptions,
+            CancellationToken ct)
         {
             if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
 
             pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
+            var rooms = await _roomService.GetRoomsAsync(pagingOptions, ct);
+
+            var collection = PagedCollection<Room>.Create<RoomsResponse>(
+                Link.ToCollection(nameof(GetRoomsAsync)),
+                rooms.Items.ToArray(),
+                rooms.TotalSize,
+                pagingOptions);
+            collection.Openings = Link.ToCollection(nameof(GetAllRoomOpeningsAsync));
+
+            return Ok(collection);
+        }
+
+        // GET /rooms/openings
+        [HttpGet("openings", Name = nameof(GetAllRoomOpeningsAsync))]
+        public async Task<IActionResult> GetAllRoomOpeningsAsync(
+            [FromQuery] PagingOptions pagingOptions,
+            CancellationToken ct)
+        {
+            if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
+
+            pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
+            pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
             var openings = await _openingService.GetOpeningsAsync(pagingOptions, ct);
 
             var collection = PagedCollection<Opening>.Create(
-                    Link.ToCollection(nameof(GetAllRoomOpeningsAsync)),
-                    openings.Items.ToArray(),
-                    openings.TotalSize,
-                    pagingOptions);
+                Link.ToCollection(nameof(GetAllRoomOpeningsAsync)),
+                openings.Items.ToArray(),
+                openings.TotalSize,
+                pagingOptions);
 
             return Ok(collection);
         }

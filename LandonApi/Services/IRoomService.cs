@@ -13,7 +13,8 @@ namespace LandonApi.Services
             Guid id,
             CancellationToken ct);
 
-        Task<IEnumerable<Room>> GetRoomsAsync(
+        Task<PagedResults<Room>> GetRoomsAsync(
+            PagingOptions pagingOptions,
             CancellationToken ct);
     }
 }

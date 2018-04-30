@@ -9,7 +9,9 @@ namespace LandonApi.Services
 {
     public interface IOpeningService
     {
-        Task<PagedResults<Opening>> GetOpeningsAsync(PagingOptions paginingOptions, CancellationToken ct);
+        Task<PagedResults<Opening>> GetOpeningsAsync(
+            PagingOptions pagingOptions,
+            CancellationToken ct);
 
         Task<IEnumerable<BookingRange>> GetConflictingSlots(
             Guid roomId,

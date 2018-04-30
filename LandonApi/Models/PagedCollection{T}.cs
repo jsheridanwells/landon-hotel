@@ -10,28 +10,31 @@ namespace LandonApi.Models
     public class PagedCollection<T> : Collection<T>
     {
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public int? Offset { get; set; } // start page
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-
-        public int? Limit { get; set; }  // how many items to return
-        public int Size { get; set; } // total numbner of items in collection
+        public int? Offset { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int? Limit { get; set; }
 
+        public int Size { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Link First { get; set; }
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Link Previous { get; set; }
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Link Next { get; set; }
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Link Last { get; set; }
 
-        public static PagedCollection<T> Create(
-                Link self,
-                T[] items,
-                int size,
-                PagingOptions pagingOptions
-            ) => new PagedCollection<T>
+        public static PagedCollection<T> Create(Link self, T[] items, int size, PagingOptions pagingOptions)
+            => Create<PagedCollection<T>>(self, items, size, pagingOptions);
+
+        public static TResponse Create<TResponse>(Link self, T[] items, int size, PagingOptions pagingOptions)
+            where TResponse : PagedCollection<T>, new()
+            => new TResponse
             {
                 Self = self,
                 Value = items,
@@ -58,7 +61,7 @@ namespace LandonApi.Models
             var parameters = new RouteValueDictionary(self.RouteValues)
             {
                 ["limit"] = limit,
-                ["offset"] = offset
+                ["offset"] = next
             };
 
             var newLink = Link.ToCollection(self.RouteName, parameters);
@@ -119,6 +122,5 @@ namespace LandonApi.Models
 
             return newLink;
         }
-
     }
 }
